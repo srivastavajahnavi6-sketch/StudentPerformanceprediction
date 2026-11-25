@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance AI</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e3a8a, #312e81);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1050px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 35px;
+            align-items: center;
+        }
+
+        .left {
+            padding: 25px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.12);
+            padding: 10px 16px;
+            border-radius: 30px;
+            margin-bottom: 25px;
+            color: #c4b5fd;
+            font-size: 14px;
+        }
+
+        .left h1 {
+            font-size: 45px;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .left h1 span {
+            color: #93c5fd;
+        }
+
+        .left p {
+            color: #cbd5e1;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .feature {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .card {
+            background: #ffffff;
+            color: #1e293b;
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+        }
+
+        .card h2 {
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #dbe2ee;
+            border-radius: 12px;
+            outline: none;
+            font-size: 15px;
+            background: #f8fafc;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+            background: white;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 7px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .predict-btn {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            background: linear-gradient(135deg, #4f46e5, #2563eb);
+            transition: 0.3s;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79,70,229,0.3);
+        }
+
+        .reset-btn {
+            padding: 15px 20px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .result {
+            display: none;
+            margin-top: 25px;
+            padding: 22px;
+            border-radius: 16px;
+            background: #f0f7ff;
+            border: 1px solid #dbeafe;
+        }
+
+        .result-title {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .score {
+            font-size: 38px;
+            font-weight: 800;
+            color: #2563eb;
+            margin: 12px 0;
+        }
+
+        .score small {
+            font-size: 16px;
+            color: #64748b;
+        }
+
+        .progress-bg {
+            height: 10px;
+            background: #dbeafe;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4f46e5, #06b6d4);
+            border-radius: 20px;
+            transition: width 1s;
+        }
+
+        .message {
+            color: #475569;
+            font-size: 14px;
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .error {
+            color: #dc2626;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 800px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .left {
+                padding: 5px;
+            }
+
+            .left h1 {
+                font-size: 34px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Left Section -->
+    <div class="left">
+        <div class="badge">✨ AI Powered Machine Learning</div>
+
+        <h1>Student Performance <span>Prediction</span></h1>
+
+        <p>
+            Discover your predicted exam performance using Machine Learning.
+            Enter your study habits, attendance and sleep hours to get
+            an estimated exam score.
+        </p>
+
+        <div class="features">
+            <div class="feature">🤖 AI Prediction</div>
+            <div class="feature">📊 Smart Analysis</div>
+            <div class="feature">⚡ Instant Result</div>
+        </div>
+    </div>
+
+    <!-- Prediction Card -->
+    <div class="card">
+
+        <h2>Predict Your Score 🎓</h2>
+        <p class="subtitle">Enter your details below</p>
+
+        <form id="predictionForm">
+
+            <div class="form-group">
+                <label>📚 Hours Studied</label>
+                <input type="number" id="Hours_Studied"
+                       min="0" max="24" step="0.1"
+                       placeholder="Hours studied per day" required>
+                <div class="hint">Study hours per day</div>
+            </div>
+
+            <div class="form-group">
+                <label>📈 Attendance (%)</label>
+                <input type="number" id="Attendance"
+                       min="0" max="100"
+                       placeholder="Enter attendance percentage" required>
+                <div class="hint">Attendance between 0 and 100%</div>
+            </div>
+
+            <div class="form-group">
+                <label>🌙 Sleep Hours</label>
+                <input type="number" id="Sleep_Hours"
+                       min="0" max="24" step="0.1"
+                       placeholder="Sleep hours per day" required>
+                <div class="hint">Average sleep hours per day</div>
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="predict-btn">
+                    ✨ Predict Exam Score
+                </button>
+
+                <button type="reset" class="reset-btn">
+                    Reset
+                </button>
+            </div>
+
+        </form>
+
+        <!-- Result -->
+        <div class="result" id="resultBox">
+            <div class="result-title">YOUR PREDICTED EXAM SCORE</div>
+
+            <div class="score">
+                <span id="scoreValue">0</span>
+                <small>/ 100</small>
+            </div>
+
+            <div class="progress-bg">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <p class="message" id="resultMessage"></p>
+        </div>
+
+        <div class="error" id="errorMessage"></div>
+
+        <footer>
+            Student Performance Prediction | Powered by Machine Learning
+        </footer>
+
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById("predictionForm");
+
+    form.addEventListener("submit", async function(e) {
+
+        e.preventDefault();
+
+        document.getElementById("errorMessage").innerText = "";
+        document.getElementById("resultBox").style.display = "none";
+
+        const data = {
+            Hours_Studied: Number(document.getElementById("Hours_Studied").value),
+            Attendance: Number(document.getElementById("Attendance").value),
+            Sleep_Hours: Number(document.getElementById("Sleep_Hours").value)
+        };
+
+        try {
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Prediction failed");
+            }
+
+            const score = Math.max(0, Math.min(100,
+                Number(result["Predicted Exam Score"])
+            ));
+
+            document.getElementById("scoreValue").innerText =
+                score.toFixed(2);
+
+            document.getElementById("progressBar").style.width =
+                score + "%";
+
+            let message;
+
+            if (score >= 80) {
+                message = "🌟 Excellent predicted performance! Keep learning consistently.";
+            } else if (score >= 60) {
+                message = "👍 Good predicted performance! Consistent practice can help you improve further.";
+            } else if (score >= 40) {
+                message = "📚 Keep practicing and build a consistent study routine.";
+            } else {
+                message = "💡 Focus on regular learning and revise your subjects consistently.";
+            }
+
+            document.getElementById("resultMessage").innerText = message;
+
+            document.getElementById("resultBox").style.display = "block";
+
+        } catch (error) {
+            document.getElementById("errorMessage").innerText =
+                "Error: " + error.message +
+                ". Please check whether Flask server is running.";
+        }
+    });
+
+    form.addEventListener("reset", function() {
+        document.getElementById("resultBox").style.display = "none";
+        document.getElementById("errorMessage").innerText = "";
+        document.getElementById("progressBar").style.width = "0%";
+    });
+</script>
+
+</body>
+</html>
